@@ -1,0 +1,22 @@
+.form {
+    background-color:#DD7230;
+    background-image: linear-gradient(#E7E393 3px, transparent 3px),
+    linear-gradient(90deg, #E7E393 3px, transparent 3px),
+    linear-gradient(rgba(255,255,255,.3) 4px, transparent 2px),
+    linear-gradient(90deg, rgba(255,255,255,.3) 4px, transparent 2px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
+    background-size: 63.25px 31px;
+}
+
+.input-box {
+    background-color: #854D27;
+    color: #E7E393;
+    border-color: #E7E393;
+    outline-color: #854D27;
+}
+
+::placeholder {
+    color: rgba(139, 139, 139, 0.459);
+}
+

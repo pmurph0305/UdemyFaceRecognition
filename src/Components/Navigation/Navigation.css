@@ -1,0 +1,6 @@
+nav {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1px 30px;
+    color: #576574
+}
