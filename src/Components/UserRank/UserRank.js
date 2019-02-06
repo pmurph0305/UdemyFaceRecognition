@@ -1,15 +1,15 @@
 import React from 'react'
 
 class UserRank extends React.Component {
-
+    
     render() {
         return (
             <div>
                 <div className='tc-db f3'>
-                    {'User, your rank is...'}
+                    {`${this.props.name}, your current number of submitted images is...`}
                 </div>
                 <div className='tc-db f1'>
-                    {'#5'}
+                    {this.props.entries}
                 </div>
             </div>
         )

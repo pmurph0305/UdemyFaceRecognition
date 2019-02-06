@@ -13,21 +13,20 @@ import UserRank from './Components/UserRank/UserRank'
 // CSS
 import './App.css';
 
-
+// calrifai api key.
 const app = new Clarifai.App({
 	apiKey: '68b7aff4f7f249a4a717359ae81506fa'
 });
    
+// for fancy particles in the background.
 const particleParams = {
-
 	    "particles": {
 	        "number": {
 				value: 50,
 				density: {
 					enable: true,
 					value_area: 800,
-				}
-				
+				}				
 	        },
 	        "size": {
 	            "value": 1
@@ -46,25 +45,58 @@ class App extends Component {
 		this.state = {
 			input: '',
 			imageUrl:'',
-			box: {},
+			box: [{}],
 			route: 'signin',
-			isSignedIn: false
+			isSignedIn: false,
+			user: {
+				id: '',
+				name: '',
+				email: '',
+				entries: 0,
+				joined: '',
+			}
 		}
+	}
+	// testing server response.
+	// componentDidMount() {
+	// 	fetch('http://localhost:8080')
+	// 		.then(response => response.json())
+	// 		.then(console.log);
+	// }
+
+	// arrow function for load user.
+	loadUser = (data) => {
+		//console.log(data);
+		this.setState({user: {
+			id: data.id,
+			name: data.name,
+			email: data.email,
+			entries: data.entries,
+			joined: data.joined,
+		}});
 	}
 
 	//does the math to calculate the bounding-box values for the face that is drawn.
 	calculateFaceLocation(data) {
-		const clarafaiBox = data.outputs[0].data.regions[0].region_info.bounding_box;
+		// get image width/height before calculating the boxes.
 		const image = document.getElementById('img-detected');
 		const width = Number(image.width);
 		const height = Number(image.height);
-		console.log(width, height);
-		return {
-			left: clarafaiBox.left_col * width,
-			right: width - (clarafaiBox.right_col * width),
-			top: clarafaiBox.top_row * height,
-			bottom: height - (clarafaiBox.bottom_row * height),
-		}
+		// map returned box data to a new array.
+		const boxes = data.outputs[0].data.regions.map(data => {
+			const clarafaiBox = data.region_info.bounding_box;
+			//console.log(data.region_info.bounding_box);
+			return {
+				left: clarafaiBox.left_col * width,
+				right: width - (clarafaiBox.right_col * width),
+				top: clarafaiBox.top_row * height,
+				bottom: height - (clarafaiBox.bottom_row * height),
+			}
+		})
+		//console.log(width, height);
+		//console.log('boxes:', boxes);
+		// return the new boxes array.
+		return boxes;
 	}
 
 	// Sets the state of box to box.
@@ -78,11 +110,28 @@ class App extends Component {
 	}
 
 	// Runs facial detection, queries clarifai's face detect model. then the result to display detected facebox.
-	onDetectSubmit = () => {
+	onPictureSubmit = () => {
 		this.setState({imageUrl: this.state.input});
 		app.models.predict(Clarifai.FACE_DETECT_MODEL,
 		 this.state.input)
-		 .then(response => this.displayDetectedFaceBox(this.calculateFaceLocation(response)))
+		 .then(response => {
+			 if (response) {
+				 fetch('http://localhost:8080/image', {
+					method: 'PUT',
+					headers: {'Content-Type' : 'application/json'},
+					body: JSON.stringify({
+						id: this.state.user.id
+					})
+				})
+				.then(response => response.json())
+				.then(count => {
+					// use object.assiogn to update entries, this allows a single item of the object to be updated.
+					this.setState(Object.assign(this.state.user, { entries: count }))
+				})
+			}
+			// calculate face locations, then display detected boxes
+			 this.displayDetectedFaceBox(this.calculateFaceLocation(response))
+		 })
 		 .catch(error => console.log(error));
 	}
 
@@ -93,7 +142,7 @@ class App extends Component {
 		} else if (route === 'signout') {
 			this.setState({isSignedIn: false})
 		}
-		console.log(route);
+		//console.log(route);
 		this.setState({route:route})
 	}
 
@@ -110,19 +159,29 @@ class App extends Component {
 				{ this.state.route=== 'home' 
 				? <div>
 					<Logo />
-					<UserRank />
+					<UserRank 
+						name={this.state.user.name}
+						entries={this.state.user.entries}
+					/>
 					<LinkInputForm
-						onDetectSubmit={this.onDetectSubmit} 
+						onPictureSubmit={this.onPictureSubmit} 
 						onInputChanged={this.onInputChanged}
 					/>
 					<FaceDetection
 						imageUrl={this.state.imageUrl}
 						box={this.state.box}
+						test={123}
 					/>
 				</div>
 				: (this.state.route === 'register'
-				? <Register onRouteChange={this.onRouteChange}/>
-				: <SignIn onRouteChange={this.onRouteChange}/>
+				? <Register 
+					onRouteChange={this.onRouteChange}
+					loadUser={this.loadUser}
+				/>
+				: <SignIn 
+					onRouteChange={this.onRouteChange}
+					loadUser={this.loadUser}
+					/>
 				)}
 			</div>
 		);

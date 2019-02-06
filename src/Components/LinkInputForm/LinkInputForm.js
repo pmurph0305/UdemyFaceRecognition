@@ -5,7 +5,7 @@ class LinkInputForm extends React.Component {
     constructor() {
         super();
         this.onInputChanged = this.onInputChanged.bind(this);
-        this.onDetectSubmit = this.onDetectSubmit.bind(this);
+        this.onPictureSubmit = this.onPictureSubmit.bind(this);
     }
 
     // passes the url entered into the field up to the parent to save in the state.
@@ -14,8 +14,8 @@ class LinkInputForm extends React.Component {
     }
 
     // called when detect button is clicked, starts face-recognition process.
-    onDetectSubmit(event) {
-        this.props.onDetectSubmit(event);
+    onPictureSubmit(event) {
+        this.props.onPictureSubmit(event);
     }
 
     render() {
@@ -33,7 +33,7 @@ class LinkInputForm extends React.Component {
                         />
                         <button 
                             className='w-25 grow pb1 f4 bw0 link dib tc-ly bg-dp'
-                            onClick={this.onDetectSubmit}
+                            onClick={this.onPictureSubmit}
                         >Detect</button>
                     </div>
                 </div>
