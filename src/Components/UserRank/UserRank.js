@@ -6,7 +6,7 @@ class UserRank extends React.Component {
         return (
             <div>
                 <div className='tc-db f3'>
-                    {`${this.props.name}, your current number of submitted images is...`}
+                    {`${this.props.name}, your current number of faces detected is...`}
                 </div>
                 <div className='tc-db f1'>
                     {this.props.entries}

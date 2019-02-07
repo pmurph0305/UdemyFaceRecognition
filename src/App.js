@@ -120,7 +120,9 @@ class App extends Component {
 					method: 'PUT',
 					headers: {'Content-Type' : 'application/json'},
 					body: JSON.stringify({
-						id: this.state.user.id
+						id: this.state.user.id,
+						// add number of faces to the users count rank.
+						faces: response.outputs[0].data.regions.length
 					})
 				})
 				.then(response => response.json())
