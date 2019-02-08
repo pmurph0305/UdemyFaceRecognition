@@ -1,5 +1,4 @@
 // Imports.
-import Clarifai from 'clarifai';
 import FaceDetection from './Components/FaceDetection/FaceDetection'
 import LinkInputForm from './Components/LinkInputForm/LinkInputForm'
 import Logo from './Components/Logo/Logo'
@@ -12,11 +11,6 @@ import UserRank from './Components/UserRank/UserRank'
 
 // CSS
 import './App.css';
-
-// calrifai api key.
-const app = new Clarifai.App({
-	apiKey: '68b7aff4f7f249a4a717359ae81506fa'
-});
    
 // for fancy particles in the background.
 const particleParams = {
@@ -37,25 +31,26 @@ const particleParams = {
 	    },
 }
 
+const initialState = {
+	input: '',
+	imageUrl:'',
+	box: [{}],
+	route: 'signin',
+	isSignedIn: false,
+	user: {
+		id: '',
+		name: '',
+		email: '',
+		entries: 0,
+		joined: '',
+	}
+}
 
 class App extends Component {
 
 	constructor() {
 		super();
-		this.state = {
-			input: '',
-			imageUrl:'',
-			box: [{}],
-			route: 'signin',
-			isSignedIn: false,
-			user: {
-				id: '',
-				name: '',
-				email: '',
-				entries: 0,
-				joined: '',
-			}
-		}
+		this.state = initialState;
 	}
 	// testing server response.
 	// componentDidMount() {
@@ -111,12 +106,20 @@ class App extends Component {
 
 	// Runs facial detection, queries clarifai's face detect model. then the result to display detected facebox.
 	onPictureSubmit = () => {
+		// clear box state so they aren't displayed while fetch/thens still going on.
+		this.setState({box: [{}]});
 		this.setState({imageUrl: this.state.input});
-		app.models.predict(Clarifai.FACE_DETECT_MODEL,
-		 this.state.input)
-		 .then(response => {
+		fetch('https://warm-oasis-40168.herokuapp.com/imageurl', {
+				method: 'POST',
+				headers: {'Content-Type' : 'application/json'},
+				body: JSON.stringify({
+					input: this.state.input
+				})
+			})
+			.then(response => response.json())
+		  .then(response => {
 			 if (response) {
-				 fetch('http://localhost:8080/image', {
+				 fetch('https://warm-oasis-40168.herokuapp.com/image', {
 					method: 'PUT',
 					headers: {'Content-Type' : 'application/json'},
 					body: JSON.stringify({
@@ -130,6 +133,7 @@ class App extends Component {
 					// use object.assiogn to update entries, this allows a single item of the object to be updated.
 					this.setState(Object.assign(this.state.user, { entries: count }))
 				})
+				.catch(console.log);
 			}
 			// calculate face locations, then display detected boxes
 			 this.displayDetectedFaceBox(this.calculateFaceLocation(response))
@@ -142,7 +146,9 @@ class App extends Component {
 		if (route === 'home') {
 			this.setState({isSignedIn: true});
 		} else if (route === 'signout') {
-			this.setState({isSignedIn: false})
+			// Change to initial state when someone logs out to get
+			// rid of user info.
+			this.setState(initialState);
 		}
 		//console.log(route);
 		this.setState({route:route})

@@ -29,7 +29,7 @@ class SignIn extends React.Component {
     // when submit is clicked.
     onSubmitSignIn = () => {
         // post form info to server through json.
-        fetch('http://localhost:8080/signin', {
+        fetch('https://warm-oasis-40168.herokuapp.com/signin', {
             method: 'POST',
             headers: {'Content-Type' : 'application/json'},
             body: JSON.stringify({
@@ -38,8 +38,12 @@ class SignIn extends React.Component {
             })
         })
         // de-json the response
-        .then(response => response.json())
+        //.then(response => response.json())
+        .then(response => {
+            return response.json();
+        })
         .then(user => {
+            console.log('user', user);
             // make sure we get a user.
             if(user.id) {
                 // load the user info, and re-route to home.

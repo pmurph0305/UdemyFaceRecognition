@@ -34,7 +34,7 @@ class Register extends React.Component {
     // When register button is clicked.
     onSubmitRegister = () => {
         // fetch to server with POST request with json
-        fetch('http://localhost:8080/register', {
+        fetch('https://warm-oasis-40168.herokuapp.com/register', {
             method: 'POST',
             headers: {'Content-Type' : 'application/json'},
             body: JSON.stringify({
@@ -43,16 +43,17 @@ class Register extends React.Component {
                 name: this.state.registerName,
             })
         })
-        // get response and de-json
+        // get response
         .then(response => response.json())
         .then(user => {
-            // if we get a user back
-            if (user) {
+            // if we get a user, server will return something, so use user.id to check.
+            if (user.id) {
                 // load the user and change route.
                 this.props.loadUser(user);
                 this.onRouteChange('home');
             }
-        });
+        })
+        .catch(err => console.log(err));
     }
 
     render() {
