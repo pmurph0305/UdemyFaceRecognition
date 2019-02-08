@@ -43,7 +43,7 @@ class SignIn extends React.Component {
             return response.json();
         })
         .then(user => {
-            console.log('user', user);
+            //console.log('user', user);
             // make sure we get a user.
             if(user.id) {
                 // load the user info, and re-route to home.
